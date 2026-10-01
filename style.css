@@ -1,0 +1,202 @@
+:root {
+  --bg: #0e0f10;
+  /* warm off-white: the primary tone carries a slight warm cast on purpose */
+  --ink: #ece7dd;
+  --ink-dim: #8a867e;
+  --ink-mute: #6e6a63;
+  --ink-faint: #54514b;
+  --ink-ghost: #3d3b37;
+  --line: rgba(236, 231, 221, 0.10);
+  --line-soft: rgba(236, 231, 221, 0.055);
+  --accent: #9c7c4c;
+
+  --sans: "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont,
+    "Helvetica Neue", Arial, sans-serif;
+  --mono: "Cascadia Mono", "Cascadia Code", ui-monospace, Consolas, "SF Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  padding: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- frame ---------- */
+
+.app {
+  height: 100%;
+  padding: 15px 20px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+button {
+  -webkit-app-region: no-drag;
+  font-family: var(--mono);
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 4px 0;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  color: var(--ink-dim);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: color 120ms ease;
+}
+
+button:hover { color: var(--ink); }
+
+/* ---------- header ---------- */
+
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.brand,
+.bar-actions {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-ghost);
+}
+
+.bar-actions {
+  display: flex;
+  gap: 20px;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+}
+
+.bar-actions button {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  color: var(--ink-ghost);
+}
+
+.bar-actions button:hover { color: var(--ink-faint); }
+.bar-actions .is-on { color: var(--accent); }
+
+/* ---------- timer ---------- */
+
+/* Asymmetric padding lifts the timer a few px above true optical centre, which
+   reads as deliberate rather than mechanically centred. */
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 0 30px;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.time {
+  margin-top: 20px;
+  font-size: 54px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.012em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.is-break .time { color: var(--ink-dim); }
+
+.meta {
+  margin-top: 24px;
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.progress {
+  margin-top: 16px;
+  height: 1px;
+  background: var(--line-soft);
+}
+
+.progress span {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background: var(--ink-mute);
+  transition: width 1s linear, background-color 200ms ease;
+}
+
+.is-running .progress span { background: var(--accent); }
+
+/* ---------- footer ---------- */
+
+/* No rule above the controls: separation comes from whitespace alone, so the
+   footer reads as part of the composition rather than its own section. */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+}
+
+.controls button {
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-indent: 0.24em;
+}
+
+/* One step below the timer, so the timer stays the single brightest element
+   while START is still clearly the primary control. */
+#playBtn {
+  font-weight: 600;
+  color: #ddd8ce;
+}
+
+#playBtn:hover { color: var(--ink); }
+
+#resetBtn,
+#skipBtn {
+  color: var(--ink-faint);
+}
+
+#resetBtn:hover,
+#skipBtn:hover { color: var(--ink-dim); }
+
+#playBtn.is-running { color: var(--accent); }
+
+:focus-visible {
+  outline: 1px solid var(--ink-dim);
+  outline-offset: 3px;
+  border-radius: 2px;
+}

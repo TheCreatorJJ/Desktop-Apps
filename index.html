@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pomodoro</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="app">
+    <header class="bar">
+      <span class="brand">Pomodoro</span>
+      <div class="bar-actions">
+        <button id="pinBtn" title="Always on top" aria-pressed="false">PIN</button>
+        <button id="closeBtn" title="Close">CLOSE</button>
+      </div>
+    </header>
+
+    <section class="stage">
+      <h1 class="label" id="sessionLabel">Focus</h1>
+      <div class="time" id="timeLabel">25:00</div>
+      <p class="meta" id="cycleLabel">Session 01</p>
+      <div class="progress"><span id="progressFill"></span></div>
+    </section>
+
+    <footer class="controls">
+      <button id="playBtn" title="Start">START</button>
+      <button id="resetBtn" title="Reset">RESET</button>
+      <button id="skipBtn" title="Next session">SKIP</button>
+    </footer>
+  </main>
+
+<script src="script.js"></script>
+</body>
+</html>
