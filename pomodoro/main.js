@@ -10,6 +10,7 @@ function createWindow() {
     frame: false,
     transparent: false,
     backgroundColor: "#0e0f10",
+    icon: __dirname + "/icon.ico",
     webPreferences: {
       contextIsolation: true,
       preload: __dirname + "/preload.js"
