@@ -1,11 +1,29 @@
 {
-  "name": "my-electron-app",
+  "name": "pomodoro",
   "version": "1.0.0",
+  "description": "Minimalist Pomodoro App",
+  "author": "TheCreatorJJ",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "devDependencies": {
-    "electron": "^43.4.1"
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.thecreatorjj.pomodoro",
+    "productName": "Pomodoro",
+    "win": {
+      "icon": "icon.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }
