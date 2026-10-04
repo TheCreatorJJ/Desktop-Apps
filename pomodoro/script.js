@@ -8,6 +8,8 @@ let total = DURATIONS.focus;
 let running = false;
 let timerId = null;
 let completed = 0;
+let lastSavedAt = null;
+let hydrated = false;
 
 const timeLabel = document.getElementById('timeLabel');
 const sessionLabel = document.getElementById('sessionLabel');
@@ -34,12 +36,29 @@ function render() {
   progressFill.style.width = `${(remaining / total) * 100}%`;
 }
 
+function persist() {
+  try {
+    const state = {
+      mode,
+      remaining,
+      running,
+      completed,
+      total,
+      lastSavedAt: Date.now()
+    };
+    if (!hydrated) {
+      return;
+    }window.api.saveState(state);
+  } catch (e) {}
+}
+
 function setRunning(state) {
   running = state;
   playBtn.textContent = running ? 'PAUSE' : 'START';
   playBtn.title = running ? 'Pause' : 'Start';
   playBtn.classList.toggle('is-running', running);
   document.body.classList.toggle('is-running', running);
+  persist();
 }
 
 function tick() {
@@ -51,33 +70,30 @@ function tick() {
       if (mode === 'focus') completed += 1;
       setRunning(false);
       render();
+      persist();
     }
     return;
-  }
-  remaining -= 1;
+  }remaining -= 1;
   render();
+  persist();
 }
 
 function switchMode(newMode) {
   clearInterval(timerId);
   mode = newMode;
   total = DURATIONS[mode];
-  remaining = total;
-  setRunning(false);
+  remaining = total;setRunning(false);
   render();
+  persist();
 }
 
-playBtn.addEventListener('click', () => {
-  if (running) {
-    clearInterval(timerId);
-    setRunning(false);
-  } else {
+playBtn.addEventListener('click', () => {if (running) {
+    clearInterval(timerId);setRunning(false);} else {
     // restarting a finished block begins a fresh one rather than completing again
-    if (remaining <= 0) remaining = total;
-    setRunning(true);
+    if (remaining <= 0) remaining = total;setRunning(true);
     timerId = setInterval(tick, 1000);
     render();
-  }
+    persist();}
 });
 
 resetBtn.addEventListener('click', () => {
@@ -85,6 +101,7 @@ resetBtn.addEventListener('click', () => {
   remaining = total;
   setRunning(false);
   render();
+  persist();
 });
 
 skipBtn.addEventListener('click', () => {
@@ -97,7 +114,50 @@ pinBtn.addEventListener('click', async () => {
   pinBtn.setAttribute('aria-pressed', String(on));
 });
 
-closeBtn.addEventListener('click', () => window.api.closeApp());
+closeBtn.addEventListener('click', () => {persist();window.api.closeApp();
+});
+
+async function init() {try {
+    const saved = await window.api.loadState();if (saved && typeof saved === 'object') {
+      const now = Date.now();
+      const MAX_AGE = 24 * 60 * 60 * 1000;
+      const ageOk = saved.lastSavedAt ? (now - saved.lastSavedAt) <= MAX_AGE : false;
+      const isValidMode = saved.mode === 'focus' || saved.mode === 'short' || saved.mode === 'long';if (!ageOk) {}
+      if (!isValidMode) {}
+      if (ageOk && isValidMode) {
+        mode = saved.mode;
+        total = saved.total || DURATIONS[mode];
+        const sessLen = DURATIONS[mode] || total;
+        remaining = typeof saved.remaining === 'number' ? saved.remaining : sessLen;
+        if (remaining > sessLen) {remaining = sessLen;
+        }
+        if (remaining < 0) {remaining = 0;
+        }
+        completed = typeof saved.completed === 'number' && saved.completed >= 0 ? saved.completed : 0;
+        const wasRunning = !!saved.running;
+        clearInterval(timerId);render();
+        if (wasRunning && remaining > 0) {
+          hydrated = true;
+          setRunning(true);
+          timerId = setInterval(tick, 1000);
+          render();
+          persist();
+        } else {
+          hydrated = true;
+          setRunning(false);
+        }
+        return;
+      }
+    } else {}
+  } catch (e) {}clearInterval(timerId);
+  mode = 'focus';
+  total = DURATIONS.focus;
+  remaining = DURATIONS.focus;
+  completed = 0;
+  setRunning(false);
+  render();
+  hydrated = true;
+}
 
 render();
-setRunning(false);
+init();
