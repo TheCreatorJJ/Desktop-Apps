@@ -52,3 +52,6 @@ coverage/
 # Misc
 *.bak
 *.tmp
+
+# Local dev shortcut
+LaunchPomodoro.bat
