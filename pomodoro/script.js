@@ -48,7 +48,8 @@ function persist() {
     };
     if (!hydrated) {
       return;
-    }window.api.saveState(state);
+    }
+window.api.saveState(state);
   } catch (e) {}
 }
 
@@ -58,6 +59,7 @@ function setRunning(state) {
   playBtn.title = running ? 'Pause' : 'Start';
   playBtn.classList.toggle('is-running', running);
   document.body.classList.toggle('is-running', running);
+  window.api.reportRunning(running);
   persist();
 }
 
@@ -73,7 +75,8 @@ function tick() {
       persist();
     }
     return;
-  }remaining -= 1;
+  }
+remaining -= 1;
   render();
   persist();
 }
@@ -82,18 +85,24 @@ function switchMode(newMode) {
   clearInterval(timerId);
   mode = newMode;
   total = DURATIONS[mode];
-  remaining = total;setRunning(false);
+  remaining = total;
+setRunning(false);
   render();
   persist();
 }
 
-playBtn.addEventListener('click', () => {if (running) {
-    clearInterval(timerId);setRunning(false);} else {
+playBtn.addEventListener('click', () => {
+if (running) {
+    clearInterval(timerId);
+setRunning(false);
+} else {
     // restarting a finished block begins a fresh one rather than completing again
-    if (remaining <= 0) remaining = total;setRunning(true);
+    if (remaining <= 0) remaining = total;
+setRunning(true);
     timerId = setInterval(tick, 1000);
     render();
-    persist();}
+    persist();
+}
 });
 
 resetBtn.addEventListener('click', () => {
@@ -114,28 +123,45 @@ pinBtn.addEventListener('click', async () => {
   pinBtn.setAttribute('aria-pressed', String(on));
 });
 
-closeBtn.addEventListener('click', () => {persist();window.api.closeApp();
+closeBtn.addEventListener('click', () => {
+persist();
+window.api.hideWindow();
 });
 
-async function init() {try {
-    const saved = await window.api.loadState();if (saved && typeof saved === 'object') {
+window.api.onTrayCommand((command) => {
+  if (command === 'start' && !running) playBtn.click();
+  else if (command === 'pause' && running) playBtn.click();
+  else if (command === 'skip') skipBtn.click();
+  else if (command === 'reset') resetBtn.click();
+});
+
+async function init() {
+try {
+    const saved = await window.api.loadState();
+if (saved && typeof saved === 'object') {
       const now = Date.now();
       const MAX_AGE = 24 * 60 * 60 * 1000;
       const ageOk = saved.lastSavedAt ? (now - saved.lastSavedAt) <= MAX_AGE : false;
-      const isValidMode = saved.mode === 'focus' || saved.mode === 'short' || saved.mode === 'long';if (!ageOk) {}
-      if (!isValidMode) {}
+      const isValidMode = saved.mode === 'focus' || saved.mode === 'short' || saved.mode === 'long';
+if (!ageOk) {
+}
+      if (!isValidMode) {
+}
       if (ageOk && isValidMode) {
         mode = saved.mode;
         total = saved.total || DURATIONS[mode];
         const sessLen = DURATIONS[mode] || total;
         remaining = typeof saved.remaining === 'number' ? saved.remaining : sessLen;
-        if (remaining > sessLen) {remaining = sessLen;
+        if (remaining > sessLen) {
+remaining = sessLen;
         }
-        if (remaining < 0) {remaining = 0;
+        if (remaining < 0) {
+remaining = 0;
         }
         completed = typeof saved.completed === 'number' && saved.completed >= 0 ? saved.completed : 0;
         const wasRunning = !!saved.running;
-        clearInterval(timerId);render();
+        clearInterval(timerId);
+render();
         if (wasRunning && remaining > 0) {
           hydrated = true;
           setRunning(true);
@@ -148,8 +174,11 @@ async function init() {try {
         }
         return;
       }
-    } else {}
-  } catch (e) {}clearInterval(timerId);
+    } else {
+}
+  } catch (e) {
+}
+clearInterval(timerId);
   mode = 'focus';
   total = DURATIONS.focus;
   remaining = DURATIONS.focus;
